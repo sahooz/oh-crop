@@ -10,7 +10,7 @@ oh-crop: OpenHarmony/HarmonyOS上的简单的图片剪裁库，可用于头像�
 ## 📚 下载安装
 
 ```shell
-ohpm i @pura/harmony-utils
+ohpm i @xinyansoft/oh-crop
 ```
 
 OpenHarmony ohpm 环境配置等更多内容，请参考: [下载安装三方库](https://ohpm.openharmony.cn/#/cn/help/downloadandinstall)  
