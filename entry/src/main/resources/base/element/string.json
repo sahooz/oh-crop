@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "OHCrop"
+    },
+    {
+      "name": "internet_permission_desc",
+      "value": "App需要联网权限以提供基本服务"
+    },
+    {
+      "name": "media_permission_desc",
+      "value": "App需要访问相册以获取图片文件"
+    }
+  ]
+}

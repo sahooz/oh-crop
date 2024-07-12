@@ -1,0 +1,53 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.cer",
+          "storePassword": "0000001BFB66DC23480B05B16A3FF5C59E5DE6304E387726C771E7C813CD4C5E3C19164C7E01024E4FCD60",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BBC55539203CBFC6F4079EE50BDFF3B4A6456DDB45C14D53B42FFD1BEA4909A3337929A28609C12",
+          "profile": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.p12"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "library",
+      "srcPath": "./library",
+    }
+  ]
+}

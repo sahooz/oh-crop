@@ -1,0 +1,12 @@
+{
+  "name": "@xinyansoft/oh-crop",
+  "version": "1.0.0",
+  "description": "OpenHarmony/HarmonyOS上的简单的图片剪裁库",
+  "main": "Index.ets",
+  "author": "Sahooz",
+  "license": "MIT",
+  "repository": "https://github.com/sahooz/oh-crop",
+  "homepage": "https://blog.xinyanruanjian.com/post/12.html",
+  "dependencies": {},
+  "devDependencies": {}
+}
