@@ -39,7 +39,7 @@ CropView仅仅包含图片的显示和手势操作、遮罩、取景框。
 
 3. 剪裁
 ```typescript
-let pm = await this.model.crop(image.PixelMapFormat.RGBA_8888);
+let pm = await this.model.crop();
 ```
 
 4. 使用得到的PixelMap去实现你的业务逻辑  

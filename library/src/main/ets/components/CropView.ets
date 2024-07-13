@@ -417,12 +417,28 @@ export class CropModel {
     let imageSource : image.ImageSource = image.createImageSource(file.fd);
     let decodingOptions : image.DecodingOptions = {
       editable: true,
-      desiredPixelFormat: format,
+      desiredPixelFormat: image.PixelMapFormat.BGRA_8888,
     }
     // 创建pixelMap
     let pm = await imageSource.createPixelMap(decodingOptions);
+    let cp = await this.copyPixelMap(pm);
+    pm.release();
     let region: image.Region = { x: x, y: y, size: { width: this.frameWidth / totalScale, height: this.getFrameHeight() / totalScale } };
-    pm.cropSync(region);
-    return pm;
+    cp.cropSync(region);
+    return cp;
+  }
+
+  async copyPixelMap(pm: PixelMap): Promise<PixelMap> {
+    const imageInfo: image.ImageInfo = await pm.getImageInfo();
+    const buffer: ArrayBuffer = new ArrayBuffer(pm.getPixelBytesNumber());
+    // TODO 知识点：通过readPixelsToBuffer实现PixelMap的深拷贝，其中readPixelsToBuffer输出为BGRA_8888
+    await pm.readPixelsToBuffer(buffer);
+    // TODO 知识点：readPixelsToBuffer输出为BGRA_8888,此处createPixelMap需转为RGBA_8888
+    const opts: image.InitializationOptions = {
+      editable: true,
+      pixelFormat: image.PixelMapFormat.RGBA_8888,
+      size: { height: imageInfo.size.height, width: imageInfo.size.width }
+    };
+    return image.createPixelMap(buffer, opts);
   }
 }

@@ -1,13 +1,13 @@
 import { CropModel, CropView } from '@xinyansoft/ohcrop';
 import { image } from '@kit.ImageKit';
-import { router } from '@kit.ArkUI';
+import fs from '@ohos.file.fs';
 import { abilityAccessCtrl, bundleManager, common } from '@kit.AbilityKit';
 import { picker } from '@kit.CoreFileKit';
 @Entry
 @Component
 struct Index {
   @State private model: CropModel = new CropModel();
-  @State private pixelMap? : PixelMap = undefined;
+  @State private cropUri? : string = undefined;
 
 
   private updateModel(src : string) {
@@ -18,8 +18,8 @@ struct Index {
 
   build() {
     Column() {
-      if(this.pixelMap) {
-        Image(this.pixelMap)
+      if(this.cropUri) {
+        Image(this.cropUri)
           .layoutWeight(1)
           .objectFit(ImageFit.Contain)
           .width('100%')
@@ -90,8 +90,7 @@ struct Index {
       maxSelectNumber: 1
     }, (error, result) => {
       if (result) {
-        this.pixelMap?.release();
-        this.pixelMap = undefined;
+        this.cropUri = undefined;
         this.updateModel(result.photoUris[0]);
       } else {
       }
@@ -99,10 +98,33 @@ struct Index {
   }
 
   async crop() {
-    if(this.pixelMap) {
+    if(this.cropUri) {
       return;
     }
     let pm = await this.model.crop(image.PixelMapFormat.RGBA_8888);
-    this.pixelMap = pm;
+    this.packToFile(getContext(this), pm);
+  }
+
+  async  packToFile(context: Context, pixelMap: PixelMap): Promise<void> {
+    const fPath: string = context.cacheDir + '/' + this.getTimeStr() + '.jpg';
+    const writeFd: fs.File = await fs.open(fPath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+
+    const opts : image.PackingOption = { format: "image/jpeg", quality: 100};
+    const imagePacker = image.createImagePacker();
+    await imagePacker.packToFile(pixelMap, writeFd.fd, opts);
+    fs.closeSync(writeFd.fd);
+
+    this.cropUri = "file://" + fPath;
+  }
+
+  getTimeStr(): string {
+    const now: Date = new Date();
+    const year: number = now.getFullYear();
+    const month: number = now.getMonth() + 1;
+    const day: number = now.getDate();
+    const hours: number = now.getHours();
+    const minutes: number = now.getMinutes();
+    const seconds: number = now.getSeconds();
+    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
   }
 }
