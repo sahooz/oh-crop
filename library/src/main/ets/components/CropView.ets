@@ -31,15 +31,16 @@ export struct CropView {
         .objectFit(ImageFit.Contain)
         .transform(this.matrix)
         .onComplete((msg) => {
-          if (msg && msg.loadingStatus == 0) { // 图片加载成功
+          if (msg) { // 图片加载成功
             this.model.imageWidth = msg.width;
             this.model.imageHeight = msg.height;
             this.model.componentWidth = msg.componentWidth;
             this.model.componentHeight = msg.componentHeight;
-            if (this.model.imageLoadEventListener != null) {
+            this.checkImageAdapt();
+
+            if (this.model.imageLoadEventListener != null && msg.loadingStatus == 1) {
               this.model.imageLoadEventListener.onImageLoaded(msg);
             }
-            this.checkImageAdapt();
           }
         })
         .onError((error) => {

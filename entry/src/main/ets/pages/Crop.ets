@@ -9,7 +9,6 @@ struct Index {
   @State private model: CropModel = new CropModel();
   @State private cropUri? : string = undefined;
 
-
   private updateModel(src : string) {
     this.model.setImage(src)
       .setFrameWidth(1000)
