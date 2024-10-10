@@ -17,7 +17,8 @@ OpenHarmony ohpm 环境配置等更多内容，请参考: [下载安装三方库
 
 ## ✍️ 使用
 
-- 定义CropModel对象
+- 定义CropModel对象  
+
 ``` typescript
 @State private model: CropModel = new CropModel()
   .setFrameWidth(1000)
@@ -38,7 +39,8 @@ private updateModel(src : string) {
 }
 ```
 
-- 使用CropView
+- 使用CropView  
+
 ```typescript
 CropView({
   model: this.model,
@@ -49,7 +51,8 @@ CropView({
 CropView仅仅包含图片的显示和手势操作、遮罩、取景框。
 
 
-- 剪裁
+- 剪裁  
+
 ```typescript
 let pm = await this.model.crop();
 ```
