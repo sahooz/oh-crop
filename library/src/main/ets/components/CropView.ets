@@ -31,14 +31,14 @@ export struct CropView {
         .objectFit(ImageFit.Contain)
         .transform(this.matrix)
         .onComplete((msg) => {
-          if (msg) { // 图片加载成功
+          if (msg && msg.loadingStatus == 1) { // 图片加载成功
             this.model.imageWidth = msg.width;
             this.model.imageHeight = msg.height;
             this.model.componentWidth = msg.componentWidth;
             this.model.componentHeight = msg.componentHeight;
             this.checkImageAdapt();
 
-            if (this.model.imageLoadEventListener != null && msg.loadingStatus == 1) {
+            if (this.model.imageLoadEventListener != null) {
               this.model.imageLoadEventListener.onImageLoaded(msg);
             }
           }
@@ -69,12 +69,24 @@ export struct CropView {
           let frameHeightInVp = px2vp(this.model.getFrameHeight());
           let x = (width - px2vp(this.model.frameWidth)) / 2;
           let y = (height - px2vp(this.model.getFrameHeight())) / 2;
-          this.context.fillRect(x, y, frameWidthInVp, frameHeightInVp)
+          if(this.model.ellipseFrame) {
+            this.context.beginPath();
+            this.context.ellipse(width / 2, height / 2, frameWidthInVp / 2, frameHeightInVp / 2, 0, 0, Math.PI * 2);
+            this.context.fill();
+          } else {
+            this.context.fillRect(x, y, frameWidthInVp, frameHeightInVp);
+          }
 
           // 画出取景框边线，使边界明显一点
           this.context.globalCompositeOperation = 'source-over';
           this.context.strokeStyle = this.model.strokeColor;
-          this.context.strokeRect(x, y, frameWidthInVp, frameHeightInVp)
+          if(this.model.ellipseFrame) {
+            this.context.beginPath();
+            this.context.ellipse(width / 2, height / 2, frameWidthInVp / 2, frameHeightInVp / 2, 0, 0, Math.PI * 2)
+            this.context.stroke()
+          } else {
+            this.context.strokeRect(x, y, frameWidthInVp, frameHeightInVp);
+          }
         })
         .enabled(false)
     }
@@ -181,8 +193,8 @@ export struct CropView {
       let yScale = this.model.getFrameHeight() / showHeight;
       let newScale = Math.max(xScale, yScale);
       this.model.scale = this.model.scale * newScale;
-      showX *= newScale;
-      showY *= newScale;
+      this.checkImageAdapt();
+      return;
     }
 
     // 调整x轴方向位置，使图像填满取景框
@@ -259,6 +271,12 @@ export class CropModel {
    * 取景框宽高比
    */
   frameRatio = 1;
+
+  /**
+   *  取景框是否椭圆/圆形
+   */
+  ellipseFrame: boolean = false;
+
   /**
    * 遮罩颜色
    */
@@ -342,6 +360,11 @@ export class CropModel {
     return this;
   }
 
+  setEllipseFrame(ellipseFrame: boolean) : CropModel {
+    this.ellipseFrame = ellipseFrame;
+    return this;
+  }
+
   public setMaskColor(color: string) : CropModel {
     this.maskColor = color;
     return this;
@@ -383,7 +406,7 @@ export class CropModel {
     this.offsetY = 0;
   }
 
-  public async crop(format: image.PixelMapFormat) : Promise<image.PixelMap> {
+  public async crop() : Promise<image.PixelMap> {
     if(!this.src || this.src == '') {
       throw new Error('Please set src first');
     }

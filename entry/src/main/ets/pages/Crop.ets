@@ -6,13 +6,21 @@ import { picker } from '@kit.CoreFileKit';
 @Entry
 @Component
 struct Index {
-  @State private model: CropModel = new CropModel();
+  @State private model: CropModel = new CropModel()
+    .setFrameWidth(1000)
+      // 如果要矩形取景框，把这个设置删掉
+    .setEllipseFrame(true)
+      // 如果要圆形，把比例设置成1
+    .setFrameRatio(0.8);
   @State private cropUri? : string = undefined;
 
   private updateModel(src : string) {
     this.model.setImage(src)
       .setFrameWidth(1000)
-      .setFrameRatio(1);
+      // 如果要矩形取景框，把这个设置删掉
+      .setEllipseFrame(true)
+      // 如果要圆形，把比例设置成1
+      .setFrameRatio(0.8);
   }
 
   build() {
@@ -100,7 +108,7 @@ struct Index {
     if(this.cropUri) {
       return;
     }
-    let pm = await this.model.crop(image.PixelMapFormat.RGBA_8888);
+    let pm = await this.model.crop();
     this.packToFile(getContext(this), pm);
   }
 

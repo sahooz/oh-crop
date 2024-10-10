@@ -1,5 +1,11 @@
 # 版本日志
 
+## 1.0.2
+
+- 支持椭圆/圆形取景框
+- 修复ISSUE [#4](https://github.com/sahooz/oh-crop/issues/4)：checkImageAdapt方法在处理缩放后大小不足填满取景框时的计算问题
+- 文档更新
+
 ## 1.0.1
 
 - PixelMap深拷贝后再剪裁
