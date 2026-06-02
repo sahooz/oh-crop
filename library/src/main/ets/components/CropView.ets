@@ -13,10 +13,13 @@ export struct CropView {
 
   @State private matrix: object = Matrix4.identity()
     .translate({ x: 0, y: 0 })
-    .scale({ x: this.model.scale, y: this.model.scale});
+    .scale({ x: this.model.scale, y: this.model.scale})
+    .rotate({ z: 1, angle: this.model.rotation });
 
   /** 临时变量，无需手动赋值 **/
   private tempScale = 1;
+  /** 临时变量，无需手动赋值 **/
+  private tempRotation = 0;
   /** 临时变量，无需手动赋值 **/
   private startOffsetX: number = 0;
   /** 临时变量，无需手动赋值 **/
@@ -126,8 +129,13 @@ export struct CropView {
             hilog.info(0, "CropView", `Pan gesture update: ${JSON.stringify(event)}`);
             if (event) {
               if (this.model.panEnabled) {
-                let distanceX: number = this.startOffsetX + vp2px(event.offsetX) / this.model.scale;
-                let distanceY: number = this.startOffsetY + vp2px(event.offsetY) / this.model.scale;
+                let radians = this.model.rotation * Math.PI / 180;
+                let offsetX = vp2px(event.offsetX);
+                let offsetY = vp2px(event.offsetY);
+                let distanceX: number = this.startOffsetX +
+                  (offsetX * Math.cos(radians) + offsetY * Math.sin(radians)) / this.model.scale;
+                let distanceY: number = this.startOffsetY +
+                  (-offsetX * Math.sin(radians) + offsetY * Math.cos(radians)) / this.model.scale;
                 this.model.offsetX = distanceX;
                 this.model.offsetY = distanceY;
                 this.updateMatrix()
@@ -152,6 +160,20 @@ export struct CropView {
           })
           .onActionEnd(() => {
             this.checkImageAdapt();
+          }),
+
+        // 旋转手势处理
+        RotationGesture({ fingers: 2 })
+          .onActionStart(() => {
+            this.tempRotation = this.model.rotation;
+          })
+          .onActionUpdate((event: GestureEvent) => {
+            if (event && this.model.rotationEnabled) {
+              this.rotateTo(this.tempRotation + event.angle);
+            }
+          })
+          .onActionEnd(() => {
+            this.checkImageAdapt();
           })
       )
     )
@@ -172,45 +194,29 @@ export struct CropView {
     let adaptScale = Math.min(widthScale, heightScale);
     hilog.info(0, "CropView", `Image scale ${adaptScale} while attaching the component[${this.model.componentWidth}, ${this.model.componentHeight}]`)
 
-    // 经过两次缩放(适配控件、手势)后，图片的实际显示大小
+    // 经过两次缩放(适配控件、手势)后，图片旋转前的实际显示大小
     let showWidth = this.model.imageWidth * adaptScale * this.model.scale;
     let showHeight = this.model.imageHeight * adaptScale * this.model.scale;
-    let imageX = (this.model.componentWidth - showWidth) / 2;
-    let imageY = (this.model.componentHeight - showHeight) / 2;
-    hilog.info(0, "CropView", `Image left top is (${imageX}, ${imageY})`)
+    let radians = this.model.rotation * Math.PI / 180;
+    let absCos = Math.abs(Math.cos(radians));
+    let absSin = Math.abs(Math.sin(radians));
+    let requiredWidth = this.model.frameWidth * absCos + this.model.getFrameHeight() * absSin;
+    let requiredHeight = this.model.frameWidth * absSin + this.model.getFrameHeight() * absCos;
 
-    // 取景框的左上角坐标
-    let frameX = (this.model.componentWidth - this.model.frameWidth) / 2;
-    let frameY = (this.model.componentHeight - this.model.getFrameHeight()) / 2;
-
-    // 图片左上角坐标
-    let showX = imageX + offsetX * scale;
-    let showY = imageY + offsetY * scale;
-    hilog.info(0, "CropView", `Image show at (${showX}, ${showY})`)
-
-    if(this.model.frameWidth > showWidth || this.model.getFrameHeight() > showHeight) { // 图片缩放后，大小不足以填满取景框
-      let xScale = this.model.frameWidth / showWidth;
-      let yScale = this.model.getFrameHeight() / showHeight;
+    if(requiredWidth > showWidth || requiredHeight > showHeight) { // 图片缩放后，大小不足以填满旋转后的取景框
+      let xScale = requiredWidth / showWidth;
+      let yScale = requiredHeight / showHeight;
       let newScale = Math.max(xScale, yScale);
       this.model.scale = this.model.scale * newScale;
       this.checkImageAdapt();
       return;
     }
 
-    // 调整x轴方向位置，使图像填满取景框
-    if(showX > frameX) {
-      showX = frameX;
-    } else if(showX + showWidth < frameX + this.model.frameWidth) {
-      showX = frameX + this.model.frameWidth - showWidth;
-    }
-    // 调整y轴方向位置，使图像填满取景框
-    if(showY > frameY) {
-      showY = frameY;
-    } else if(showY + showHeight < frameY + this.model.getFrameHeight()) {
-      showY = frameY + this.model.getFrameHeight() - showHeight;
-    }
-    this.model.offsetX = (showX - imageX) / scale;
-    this.model.offsetY = (showY - imageY) / scale;
+    // 在旋转前的图片坐标系内限制偏移，避免取景框出现空白。
+    let maxOffsetX = (showWidth - requiredWidth) / 2 / scale;
+    let maxOffsetY = (showHeight - requiredHeight) / 2 / scale;
+    this.model.offsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX));
+    this.model.offsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY));
     this.updateMatrix();
   }
 
@@ -219,10 +225,16 @@ export struct CropView {
     this.updateMatrix();
   }
 
+  public rotateTo(rotation: number): void {
+    this.model.setRotation(rotation);
+    this.updateMatrix();
+  }
+
   public updateMatrix(): void {
     this.matrix = Matrix4.identity()
       .translate({ x: this.model.offsetX, y: this.model.offsetY })
       .scale({ x: this.model.scale, y: this.model.scale })
+      .rotate({ z: 1, angle: this.model.rotation })
   }
 }
 
@@ -263,6 +275,10 @@ export class CropModel {
    * 是否可以缩放
    */
   zoomEnabled: boolean = true;
+  /**
+   * 是否可以旋转
+   */
+  rotationEnabled: boolean = true;
   /**
    * 取景框宽度
    */
@@ -320,6 +336,10 @@ export class CropModel {
    * y轴方向偏移量
    */
   offsetY: number = 0;
+  /**
+   * 顺时针旋转角度
+   */
+  rotation: number = 0;
 
   /////////////////////////////////////////////
 
@@ -347,6 +367,16 @@ export class CropModel {
 
   public setZoomEnabled(zoomEnabled: boolean): CropModel {
     this.zoomEnabled = zoomEnabled;
+    return this;
+  }
+
+  public setRotationEnabled(rotationEnabled: boolean): CropModel {
+    this.rotationEnabled = rotationEnabled;
+    return this;
+  }
+
+  public setRotation(rotation: number): CropModel {
+    this.rotation = (rotation % 360 + 360) % 360;
     return this;
   }
 
@@ -388,6 +418,14 @@ export class CropModel {
     return this.zoomEnabled;
   }
 
+  public isRotationEnabled(): boolean {
+    return this.rotationEnabled;
+  }
+
+  public getRotation(): number {
+    return this.rotation;
+  }
+
   public getImageWidth(): number {
     return this.imageWidth;
   }
@@ -404,6 +442,7 @@ export class CropModel {
     this.scale = 1;
     this.offsetX = 0;
     this.offsetY = 0;
+    this.rotation = 0;
   }
 
   public async crop() : Promise<image.PixelMap> {
@@ -419,23 +458,7 @@ export class CropModel {
     let heightScale = this.componentHeight / this.imageHeight;
     let adaptScale = Math.min(widthScale, heightScale);
 
-    // 经过两次缩放(适配控件、手势)后，图片的实际显示大小
     let totalScale = adaptScale * this.scale;
-    let showWidth = this.imageWidth * totalScale;
-    let showHeight = this.imageHeight * totalScale;
-    let imageX = (this.componentWidth - showWidth) / 2;
-    let imageY = (this.componentHeight - showHeight) / 2;
-
-    // 取景框的左上角坐标
-    let frameX = (this.componentWidth - this.frameWidth) / 2;
-    let frameY = (this.componentHeight - this.getFrameHeight()) / 2;
-
-    // 图片左上角坐标
-    let showX = imageX + this.offsetX * this.scale;
-    let showY = imageY + this.offsetY * this.scale;
-
-    let x = (frameX - showX) / totalScale;
-    let y = (frameY - showY) / totalScale;
 
     let file = fs.openSync(this.src, fs.OpenMode.READ_ONLY)
     let imageSource : image.ImageSource = image.createImageSource(file.fd);
@@ -447,7 +470,18 @@ export class CropModel {
     let pm = await imageSource.createPixelMap(decodingOptions);
     let cp = await this.copyPixelMap(pm);
     pm.release();
-    let region: image.Region = { x: x, y: y, size: { width: this.frameWidth / totalScale, height: this.getFrameHeight() / totalScale } };
+    if (this.rotation != 0) {
+      await cp.rotate(this.rotation);
+    }
+    let rotatedImageInfo = await cp.getImageInfo();
+    let radians = this.rotation * Math.PI / 180;
+    let offsetScreenX = (this.offsetX * Math.cos(radians) - this.offsetY * Math.sin(radians)) * this.scale;
+    let offsetScreenY = (this.offsetX * Math.sin(radians) + this.offsetY * Math.cos(radians)) * this.scale;
+    let cropWidth = this.frameWidth / totalScale;
+    let cropHeight = this.getFrameHeight() / totalScale;
+    let x = rotatedImageInfo.size.width / 2 - offsetScreenX / totalScale - cropWidth / 2;
+    let y = rotatedImageInfo.size.height / 2 - offsetScreenY / totalScale - cropHeight / 2;
+    let region: image.Region = { x: x, y: y, size: { width: cropWidth, height: cropHeight } };
     cp.cropSync(region);
     return cp;
   }

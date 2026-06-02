@@ -80,6 +80,14 @@ panEnabled: boolean = true;
 */
 zoomEnabled: boolean = true;
 /**
+* 是否可以旋转
+*/
+rotationEnabled: boolean = true;
+/**
+* 顺时针旋转角度
+*/
+rotation: number = 0;
+/**
 * 取景框宽度
 */
 frameWidth = 1000;
@@ -105,14 +113,13 @@ strokeColor: string = '#FFFFFF';
 imageLoadEventListener: ImageLoadEventListener | null = null;
 ```  
 
-CropModel设置也支持setter链式调用。
+CropModel设置也支持setter链式调用，例如通过 `.setRotationEnabled(false)` 关闭双指旋转，或者通过 `.setRotation(90)` 预设顺时针旋转角度。
 
 ## ⚠️ 局限性及注意事项
 
 - 椭圆或者圆形取景框仅为视觉效果，剪裁的结果仍然是矩形图片
-- 暂不支持旋转
 
-> 如果确实有较多的以上两种情况的需求，后续再考虑支持。可通过ISSUE反馈。  
+> 如果确实有较多的以上情况的需求，后续再考虑支持。可通过ISSUE反馈。
 > 欢迎PR，人人为我，我为人人
 
 ## 📱 更多

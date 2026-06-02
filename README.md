@@ -5,7 +5,7 @@ oh-crop: OpenHarmony/HarmonyOS上的简单的图片剪裁库，可用于头像�
 代码仓库：[oh-crop](https://github.com/sahooz/oh-crop)
 
 效果预览：  
-![](./images/sample.gif)
+![](./library/images/sample.gif)
 
 ## ⚙️ 下载安装
 
@@ -80,6 +80,14 @@ panEnabled: boolean = true;
 */
 zoomEnabled: boolean = true;
 /**
+* 是否可以旋转
+*/
+rotationEnabled: boolean = true;
+/**
+* 顺时针旋转角度
+*/
+rotation: number = 0;
+/**
 * 取景框宽度
 */
 frameWidth = 1000;
@@ -105,14 +113,13 @@ strokeColor: string = '#FFFFFF';
 imageLoadEventListener: ImageLoadEventListener | null = null;
 ```  
 
-CropModel设置也支持setter链式调用。
+CropModel设置也支持setter链式调用，例如通过 `.setRotationEnabled(false)` 关闭双指旋转，或者通过 `.setRotation(90)` 预设顺时针旋转角度。
 
 ## ⚠️ 局限性及注意事项
 
 - 椭圆或者圆形取景框仅为视觉效果，剪裁的结果仍然是矩形图片
-- 暂不支持旋转
 
-> 如果确实有较多的以上两种情况的需求，后续再考虑支持  
+> 如果确实有较多的以上情况的需求，后续再考虑支持
 > 欢迎PR，人人为我，我为人人
 
 ## 📱 更多
@@ -124,7 +131,7 @@ CropModel设置也支持setter链式调用。
 我的博客：https://blog.xinyanruanjian.com/
 
 我的公众号：程序员吹白  
-![](images/plat.jpg)
+![](./library/images/plat.jpg)
 
 鸿蒙开发交流QQ群：546723002
 

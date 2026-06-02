@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.cer",
-          "storePassword": "0000001BFB66DC23480B05B16A3FF5C59E5DE6304E387726C771E7C813CD4C5E3C19164C7E01024E4FCD60",
+          "certpath": "/Users/sahooz/.ohos/config/default_OHCrop_9e-8KfwHQ9ZzQGwEw-RLY0NvIbRcFy8QtVQyMLmDSzE=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BBC55539203CBFC6F4079EE50BDFF3B4A6456DDB45C14D53B42FFD1BEA4909A3337929A28609C12",
-          "profile": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.p7b",
+          "keyPassword": "0000001BA0B05E3776573536C5B21E7425B44FDE52BA1834FE658A844AA13C0D557D5285BAEEC9B0C9462B",
+          "profile": "/Users/sahooz/.ohos/config/default_OHCrop_9e-8KfwHQ9ZzQGwEw-RLY0NvIbRcFy8QtVQyMLmDSzE=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "/Users/sahooz/.ohos/config/default_OHCrop_Gg0cBRhwylWlrUek5nzFl4k7RE4dWazr_46uRTEOQYc=.p12"
+          "storeFile": "/Users/sahooz/.ohos/config/default_OHCrop_9e-8KfwHQ9ZzQGwEw-RLY0NvIbRcFy8QtVQyMLmDSzE=.p12",
+          "storePassword": "0000001B2D4A484CBF34D91802ECB59FDE046742AA5C1666FE446E7D6B1FFA64A9C44553D2D6AE70173F09"
         }
       }
     ],

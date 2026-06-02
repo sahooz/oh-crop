@@ -9,18 +9,18 @@ struct Index {
   @State private model: CropModel = new CropModel()
     .setFrameWidth(1000)
       // 如果要矩形取景框，把这个设置删掉
-    .setEllipseFrame(true)
+    .setEllipseFrame(false)
       // 如果要圆形，把比例设置成1
-    .setFrameRatio(0.8);
+    .setFrameRatio(1);
   @State private cropUri? : string = undefined;
 
   private updateModel(src : string) {
     this.model.setImage(src)
       .setFrameWidth(1000)
       // 如果要矩形取景框，把这个设置删掉
-      .setEllipseFrame(true)
+      .setEllipseFrame(false)
       // 如果要圆形，把比例设置成1
-      .setFrameRatio(0.8);
+      .setFrameRatio(1);
   }
 
   build() {
